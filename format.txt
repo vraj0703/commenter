@@ -1,0 +1,13 @@
+"""
+Author: Commenter
+Date: <CURRENT_DATE>
+Description:
+<A high-level summary of the file's purpose in one or two sentences.>
+
+Functions:
+- <function_name_1>: <Brief description of what this function does.>
+- <function_name_2>: <Brief description of what this function does.>
+
+Dependencies:
+- <List of major libraries or modules this file depends on.>
+"""

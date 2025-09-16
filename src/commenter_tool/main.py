@@ -3,6 +3,8 @@ import os
 import subprocess
 import time
 import re
+import importlib.resources
+from pathlib import Path
 import textwrap # NEW: Import the textwrap module
 
 # --- Configuration ---
@@ -135,12 +137,54 @@ def process_file(file_path, comment_format, comment_syntax):
         print(f"   ❌ An unexpected error occurred while processing {file_path}: {e}")
 
 
+def setup_user_config():
+    """
+    Checks for a user config directory, creates it if needed, and copies
+    default config files there on the first run. Now includes debug logging.
+    """
+    try:
+        config_dir = Path.home() / ".config" / "commenter"
+        print(f"DEBUG: Target config directory is: {config_dir}")
+
+        config_dir.mkdir(parents=True, exist_ok=True)
+
+        config_files = ["format.txt", "syntax.txt"]
+
+        for filename in config_files:
+            user_file = config_dir / filename
+            print(f"DEBUG: Checking for user file: {user_file}")
+
+            if not user_file.exists():
+                print(f"INFO: Config file '{filename}' not found. Attempting to create it from package default.")
+                try:
+                    # Find the default file inside the installed package
+                    default_file_ref = importlib.resources.files('commenter_tool') / 'data' / filename
+
+                    with importlib.resources.as_file(default_file_ref) as default_file_path:
+                        # This is the critical copy step
+                        print(f"DEBUG: Copying from package path '{default_file_path}' to user path '{user_file}'")
+                        shutil.copy(default_file_path, user_file)
+
+                        if user_file.exists():
+                            print(f"SUCCESS: Successfully copied '{filename}'.")
+                        else:
+                            print(f"ERROR: Copy operation for '{filename}' failed silently.")
+
+                except FileNotFoundError:
+                    print(f"FATAL ERROR: Could not find the default '{filename}' inside the package data. The package might be installed incorrectly.")
+                except Exception as e:
+                    print(f"FATAL ERROR: An unexpected error occurred during file copy for '{filename}': {e}")
+            else:
+                print(f"INFO: User file '{filename}' already exists. Skipping copy.")
+
+        return config_dir
+    except Exception as e:
+        print(f"FATAL ERROR: An error occurred in the configuration setup process: {e}")
+        return None
+
 def main():
-    """
-    The main function to drive the script.
-    """
     if len(sys.argv) != 2:
-        print("Usage: python commenter.py <path_to_file_or_folder>")
+        print("Usage: commenter <path_to_file_or_folder>")
         sys.exit(1)
 
     target_path = sys.argv[1]
@@ -149,14 +193,26 @@ def main():
         print(f"Error: The path '{target_path}' does not exist.")
         sys.exit(1)
 
+    print("--- Setting up user configuration ---")
+    config_path = setup_user_config()
+    if not config_path:
+        print("Could not set up configuration. Exiting.")
+        sys.exit(1)
+    print("--- Configuration setup complete ---")
+
     try:
-        with open('format.txt', 'r', encoding='utf-8') as f:
+        format_file = config_path / 'format.txt'
+        syntax_file = config_path / 'syntax.txt'
+
+        with open(format_file, 'r', encoding='utf-8') as f:
             comment_format = f.read()
-        with open('syntax.txt', 'r', encoding='utf-8') as f:
+        with open(syntax_file, 'r', encoding='utf-8') as f:
             comment_syntax = f.read().strip()
-    except FileNotFoundError as e:
-        print(f"Error: Configuration file not found -> {e.filename}")
-        print("Please ensure both 'format.txt' and 'syntax.txt' exist in the script's directory.")
+
+    except FileNotFoundError:
+        # This is the error you were seeing.
+        print(f"\nError: Could not find config files in {config_path}.")
+        print("Please check the debug messages above to see why the files were not created.")
         sys.exit(1)
 
     if os.path.isfile(target_path):

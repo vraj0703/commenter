@@ -2,7 +2,7 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
-      <module fileurl="file://$PROJECT_DIR$/commenter.iml" filepath="$PROJECT_DIR$/commenter.iml" />
+      <module fileurl="file://$PROJECT_DIR$/src/commenter_tool/commenter.iml" filepath="$PROJECT_DIR$/src/commenter_tool/commenter.iml" />
     </modules>
   </component>
 </project>

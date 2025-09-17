@@ -1,87 +1,148 @@
-## AI Code Commenter using Ollama
-This Python script automatically generates and prepends comments to your source code files using a locally running Ollama model. It can process a single file or recursively walk through an entire directory, making it easy to document a whole codebase.
 
-The comment style is fully customizable through a simple text file.
+---
 
-## Features
-🤖 AI-Powered Commenting: Leverages local LLMs via Ollama to understand code and generate meaningful comments.
+# **AI Code Commenter**
 
-📂 Batch Processing: Can run on an entire folder (your codebase) to comment on all supported files recursively.
+An intelligent command-line tool that uses local Ollama models to automatically generate high-quality, structured comments for your code.
 
-📄 Single File Mode: Can also target a single file for quick commenting.
+The **AI Code Commenter** is designed for developers who value security, customization, and efficiency. By leveraging the power of local Large Language Models (LLMs), it offers several key advantages:
 
-🎨 Customizable Format: You define the exact format of the comment block using a format.txt template.
+* 🔒 **Code Security & Privacy**: Your code is never sent to a third-party API. All processing happens entirely on your local machine, ensuring your intellectual property remains private and secure.
+* ⚙️ **Exhaustive Customization**: The tool is not hardcoded for any specific language or style. Through simple text files (format.txt for content and syntax.txt for style), you can adapt it to any programming language, codebase, or team's coding standards.
+* 🚀 **Workflow Automation**: Quickly document a single file or an entire project with a single command, saving you time and improving the maintainability of your code.
 
-🔌 Simple & Local: No need for external APIs or paid services. It all runs on your machine.
+---
 
-## Prerequisites
-Before you begin, ensure you have the following installed and running:
+## **Features**
 
-Python 3.6+: The script is written in Python.
+* **Local First**: Operates entirely offline using your own Ollama instance.
+* **Highly Configurable**: Define comment content and syntax using simple text files.
+* **CLI-Based**: Easy to integrate into scripts and automated workflows.
+* **Batch Processing**: Run on a single file or recursively through an entire folder.
+* **Intelligent Setup**: Automatically checks for Ollama, manages models, and sets up user-friendly configuration files on the first run.
 
-Ollama: You must have Ollama installed and the service running on your machine.
+---
 
-An Ollama Model: You need at least one model pulled. For code-related tasks, we recommend llama3 for quality or phi3:mini for speed.
+## **Installation & Setup**
 
-Bash
+Follow these steps to get the commenter tool up and running.
 
-# Pull a high-quality model (slower, needs ~8GB RAM)
-ollama pull llama3
+### **Step 1: Install Ollama**
 
-# Or pull a fast, smaller model (needs ~4GB RAM)
-ollama pull phi3:mini
-## Setup
-Download Files: Place the commenter.py script and the format.txt file in the same directory.
+The commenter tool requires Ollama to be running on your system.
 
-Configure the Model (Optional): Open commenter.py and change the OLLAMA_MODEL variable if you want to use a different model than the default (llama3).
+* **Linux & macOS**: Run the following command in your terminal.
+  > ```curl \-fsSL https://ollama.com/install.sh | sh```
 
-Python
+* **Windows**: Download and run the installer from the [Ollama website](https://ollama.com/).
 
-# In commenter.py
-OLLAMA_MODEL = "phi3:mini" # Example: Changed to a faster model
-Customize the Comment Format: Open format.txt and edit it to define your desired comment structure. The script will instruct the AI to follow this format precisely. The default format is:
+After installing, you need to pull a model. llama3 is a great choice for quality. For faster performance on less powerful hardware, phi3:mini is an excellent alternative.
 
-"""
-Author: AI Assistant
-Date: <CURRENT_DATE>
-Description:
-<A high-level summary of the file's purpose in one or two sentences.>
+Pull a high-quality model (recommended)  
+>```ollama pull llama3```
 
-Functions:
-- <function_name_1>: <Brief description of what this function does.>
-- <function_name_2>: <Brief description of what this function does.>
-  """
-## How to Run on Your Codebase
-You can run the script from your terminal.
+\# Or pull a smaller, faster model  
+>```ollama pull phi3:mini```
 
-To Comment on an Entire Codebase (Folder):
-Provide the path to the root folder of your project. The script will automatically find and process all supported code files (e.g., .py, .js, .dart, etc.) inside it and all its subdirectories.
+**Important**: Make sure the Ollama application is running before you use the commenter tool.
 
-Bash
+### **Step 2: Install the Commenter Tool**
 
-python commenter.py /path/to/your/project_folder/
-Example:
+Install the tool directly from PyPI using pip.
 
-Bash
+>```pip install ai-code-commenter-vraj0703```
 
-python commenter.py C:\Users\YourUser\Documents\MyWebApp\
-To Comment on a Single File:
-Provide the direct path to the specific file you want to comment.
+### **Step 3: First-Time Configuration**
 
-Bash
+The first time you run the config command, the tool will automatically create a configuration directory and default templates on your system.
 
-python commenter.py /path/to/your/file.py
-Example:
+>```commenter config```
 
-Bash
+This command will:
 
-python commenter.py C:\Users\YourUser\Documents\MyWebApp\src\utils.py
-## Troubleshooting
-Timeout Errors
-If you see an error like Error: The 'ollama' command timed out..., it means the AI model is taking too long to respond. This usually happens the first time you run it.
+1. Verify that Ollama is installed.
+2. Create a folder at ```\~/.config/commenter/``` (this path works for Linux, macOS, and Windows).
+3. Copy default ```format.txt``` and ```syntax.txt``` files into it, which you can then customize.
 
-Solution 1 (Warm-up): Run a simple command in your terminal before using the script to load the model into memory: ollama run llama3 "Hello!".
+---
 
-Solution 2 (Increase Timeout): Open commenter.py and increase the timeout=300 value to a higher number (e.g., 600 for 10 minutes).
+## **Configuration**
 
-Solution 3 (Use a Smaller Model): A smaller model like phi3:mini is much faster. See the setup section to change the model.
+You can easily configure the tool to fit your needs using the config command.
+
+### **Setting the Ollama Model**
+
+You can tell the commenter which Ollama model to use. If the model isn't downloaded, the tool will pull it for you.
+
+>```commenter config \--model phi3:mini```
+
+### **Customizing Comment Templates**
+
+The real power of this tool comes from its configurable templates. The config command allows you to point the tool to your own custom template files.
+
+Example for a project using custom Java templates 
+
+>```commenter config \--format-path "/path/to/my/java\_format.txt" \--syntax-path "/path/to/my/java\_syntax.txt"```
+
+If you don't set custom paths, the tool will use the default files located in \~/.config/commenter/.
+
+#### format.txt \- The Content and Structure
+
+This file controls **what** goes inside your comments. You can define placeholders for the AI to fill in.
+
+*Example format.txt:*
+
+> Author: AI Assistant  
+> Date: \<CURRENT\_DATE\>  
+> Description: <A high-level summary of the file's purpose.\>
+> 
+> Functions:\- \<function\_name\_1\>: \<Brief description of what this function does.\>
+
+#### **syntax.txt \- The Comment Style**
+
+This file tells the AI **how** to write the comment for a specific language.
+
+*Example syntax.txt for Java/JavaScript:*
+
+>The entire comment block must be a valid documentation comment. It must start with \`/\*\*\` on its own line, each line must begin with a \` \* \`, and it must end with \` \*/\` on its own line.
+
+*Example syntax.txt for Python:*
+
+>Every single line of the comment block must start with a \`\#\` character followed by a space.
+
+---
+
+## **Usage**
+
+Once configured, using the tool is simple. Use the run command followed by the path to your code.
+
+### **Commenting a Single File**
+
+> ```commenter run /path/to/your/file.py```
+
+### **Commenting an Entire Folder**
+
+The tool will find and comment on all supported source files within the folder and its subdirectories.
+
+>```commenter run /path/to/your/project/```
+
+---
+
+## **Troubleshooting**
+
+* **"Ollama is not installed" Error**:
+    * Ensure the Ollama desktop application is running.
+    * Make sure you have run the Ollama installation script, and the ollama command is available in your system's PATH.
+* **Timeout Errors**:
+    * The first time you use a model, Ollama needs to load it into memory, which can be slow. Try "warming up" the model by running ```ollama run \<your\_model\_name\> "Hello\!"``` in your terminal first.
+    * Consider using a smaller model (phi3:mini) for faster processing by running ```commenter config \--model phi3:mini```.
+* **Resetting Configuration**:
+    * If your configuration files get corrupted, you can safely delete the ```\~/.config/commenter``` directory. The next time you run commenter config, the folder and default files will be recreated.
+
+---
+
+## **Contributing & Support**
+
+This project is open source. If you find a bug or have a feature request, please open an issue on our GitHub repository.
+
+* **GitHub Repository**: [vraj0703/commenter](https://github.com/vraj0703/commenter)

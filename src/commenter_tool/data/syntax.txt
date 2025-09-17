@@ -1,4 +1,5 @@
 Dart supports single-line comments, multi-line comments, and documentation comments.
+Use only documentation comments.
 
 Single-line comments
 #
